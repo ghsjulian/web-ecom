@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 - Page Not Found</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Container */
+        .container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 404 Number Styling */
+        .error-code {
+            font-size: 8rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            line-height: 1;
+            letter-spacing: -5px;
+        }
+
+        /* Title */
+        .title {
+            font-size: 2rem;
+            margin-bottom: 16px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        /* Description */
+        .description {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 30px;
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(68, 160, 141, 0.3);
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(68, 160, 141, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #4ecdc4;
+            border: 2px solid #4ecdc4;
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: #4ecdc4;
+            color: white;
+            box-shadow: 0 5px 15px rgba(68, 160, 141, 0.3);
+        }
+
+        /* Illustration (SVG) */
+        .illustration {
+            margin: 30px 0;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .illustration svg {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 6rem;
+                letter-spacing: -3px;
+            }
+
+            .title {
+                font-size: 1.7rem;
+            }
+
+            .description {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 30px 15px;
+                border-radius: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .error-code {
+                font-size: 4.5rem;
+                letter-spacing: -2px;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                display: block;
+                width: 80%;
+                margin: 12px auto;
+                padding: 14px 20px;
+            }
+
+            .illustration svg {
+                max-width: 220px;
+            }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="error-code" aria-label="404">404</h1>
+        <h2 class="title">Oops! Page Not Found</h2>
+        <p class="description">
+            The page you're looking for seems to have wandered off into the digital wilderness. 
+            Don't worry — let's get you back on track!
+        </p>
+
+        <!-- Simple SVG Illustration -->
+        <div class="illustration" aria-hidden="true">
+            <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                <!-- Ground -->
+                <ellipse cx="200" cy="280" rx="180" ry="30" fill="#ddd" opacity="0.5"/>
+                
+                <!-- Magnifying Glass -->
+                <circle cx="120" cy="120" r="60" fill="none" stroke="#4ecdc4" stroke-width="12"/>
+                <line x1="170" y1="170" x2="230" y2="230" stroke="#4ecdc4" stroke-width="12" stroke-linecap="round"/>
+                
+                <!-- Question Mark Character -->
+                <path d="M 260 80 Q 240 80, 240 100 Q 240 120, 260 125 Q 280 130, 290 115 Q 295 100, 285 90 Q 275 80, 260 80" 
+                      fill="none" stroke="#ff6b6b" stroke-width="10" stroke-linecap="round"/>
+                <circle cx="275" cy="150" r="15" fill="#ff6b6b"/>
+                
+                <!-- Floating Files -->
+                <rect x="50" y="200" width="50" height="60" rx="5" fill="#ff6b6b" opacity="0.7" transform="rotate(-15 75 230)"/>
+                <rect x="320" y="180" width="50" height="60" rx="5" fill="#4ecdc4" opacity="0.7" transform="rotate(20 345 210)"/>
+            </svg>
+        </div>
+
+        <a href="/" class="btn" aria-label="Go to homepage">
+            <span class="sr-only">Return to </span>Home Page
+        </a>
+        <a href="javascript:history.back()" class="btn btn-secondary" aria-label="Go back to previous page">
+            Go Back
+        </a>
+
+        <p class="sr-only">Error 404: Page not found</p>
+    </div>
+</body>
+</html>
