@@ -1,7 +1,11 @@
 import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/admin-login.css";
+import useAuth from "../store/useAuth";
 
 const AdminLogin = () => {
+  const { loginNow, isSigningIn } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const msgRef = useRef(null);
@@ -33,10 +37,11 @@ const AdminLogin = () => {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isValid()) return;
-    console.log("Okay...");
+    //console.log("Okay...");
+    await loginNow({ email, password }, showMessage, navigate);
   };
 
   return (
@@ -69,7 +74,7 @@ const AdminLogin = () => {
 
         <div className="remember-me">
           <input type="checkbox" id="remember" />
-          <label for="remember">Remember me</label>
+          <label htmlFor="remember">Remember me</label>
         </div>
 
         <button onClick={handleSubmit} className="login-btn">

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { NavLink,useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import * as icons from "react-icons/fc";
 
 const Sidebar = () => {
-  const location = useLocation()
-  const [path,setpath] = useState("")
+  const location = useLocation();
+  const [path, setpath] = useState("");
 
-  useEffect(()=>{
-    setpath(location)
-  },[])
+  useEffect(() => {
+    setpath(location);
+  }, []);
 
   return (
     <aside>

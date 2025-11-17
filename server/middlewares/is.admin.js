@@ -2,25 +2,37 @@ const userModel = require("../models/user.model");
 const { decodeJWT } = require("../functions/jwt-token-generator");
 
 const isAdmin = async (req, res, next) => {
-    try {
-        const token = req?.cookies?.echodaadmin || null;
-        if (token === null) throw new Error('No token provided');
-        const decoded = await decodeJWT(token);
-        if (!decoded || decoded === null) throw new Error('Unauthorized - invalid user token');
-        // check if user exists in DB or has admin role (optional)
-        const user = await userModel.findById(decoded._id);
-        if (!user) throw new Error('User not found');
-        // ensure only admins pass:
-        if (user.role !== 'ADMIN') throw new Error('Access denied - not an admin');
-        req.user = user;
-        next(); 
-    } catch (err) {
-        console.error('Error:', err);
-        return res.status(403).json({
-            success: false,
-            message: err.message
-        });
+  try {
+    const token = req?.cookies?.ecomadmin || null;
+    if (!token) throw new Error("No token provided");
+
+    // Decode token
+    const decoded = await decodeJWT(token);
+    if (!decoded || !decoded._id) {
+      throw new Error("Unauthorized - invalid user token");
     }
+
+    // Check user exists
+    const user = await userModel.findById(decoded._id).select("-password");
+    if (!user) throw new Error("User not found");
+
+    // Check role
+    if (user.role !== "ADMIN") {
+      throw new Error("Access denied - not an admin");
+    }
+
+    // Attach admin user to request
+    req.admin = user;
+
+    // Allow access
+    next();
+  } catch (err) {
+    console.error("Error:", err.message);
+    return res.status(403).json({
+      success: false,
+      message: err.message,
+    });
+  }
 };
 
 module.exports = isAdmin;
