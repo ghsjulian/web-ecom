@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/admin-login.css";
 import useAuth from "../store/useAuth";
 
@@ -49,7 +49,7 @@ const AdminLogin = () => {
     <div className="login-container">
       <div className="login-header">
         <h1>Admin Login</h1>
-        <p ref={msgRef}></p>
+        <p className="" ref={msgRef}></p>
       </div>
 
       <form className="login-form">
@@ -89,7 +89,7 @@ const AdminLogin = () => {
 
       <div className="login-footer">
         <p>
-          <a href="#">Forgot Password?</a>
+          <NavLink to="/reset-password">Forgot Password</NavLink>
         </p>
       </div>
     </div>

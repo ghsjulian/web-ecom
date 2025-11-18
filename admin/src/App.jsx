@@ -23,6 +23,7 @@ import AdminProtector from "./protector/AdminProtector";
 import useAuth from "./store/useAuth";
 import { useEffect } from "react";
 import Loader from "./components/Loader";
+import ForgetPassword from "./pages/ForgetPassword";
 
 const App = () => {
   const { admin, isAuth, isChecking } = useAuth();
@@ -59,6 +60,7 @@ const App = () => {
               element={!admin ? <AdminLogin /> : <Navigate to="/" />}
             />
             <Route path="/create-user" element={<Signup />} />
+            <Route path="/reset-password" element={<ForgetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
