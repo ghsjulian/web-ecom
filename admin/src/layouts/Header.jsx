@@ -1,6 +1,7 @@
 import React from "react";
 import * as icons from "react-icons/fc";
 import { IoMdLogOut } from "react-icons/io";
+import { FaPowerOff } from "react-icons/fa";
 import useAuth from "../store/useAuth";
 
 const Header = () => {
@@ -37,7 +38,7 @@ const Header = () => {
           title="Logout"
           aria-label="Logout"
         >
-          <IoMdLogOut style={{ color: "#444749ff" }} size={24} />
+          <FaPowerOff style={{ color: "#cf0000ff" }} size={23} />
         </button>
         <label
           style={{ marginTop: "5px" }}

@@ -4,6 +4,8 @@ import axios from "../libs/axiosConfig";
 const useAuth = create((set, get) => ({
   admin: JSON.parse(localStorage.getItem("ecom-admin")) || null,
   isSigningIn: false,
+  isChecking: true,
+  isAdmin: false,
 
   loginNow: async (data, showMessage, navigate) => {
     try {
@@ -47,17 +49,19 @@ const useAuth = create((set, get) => ({
   },
   isAuth: async () => {
     try {
-      const res = axios.get("/is-admin");
+      const res = axios.get("/auth/is-admin");
       if (res?.data?.success) {
-        console.log(res.data);
+        set({ isAdmin: true });
       }
-    } catch (err) {
-      console.error("Error:", err);
+    } catch (error) {
+      set({ isAdmin: false });
+    } finally {
+      set({ isChecking: false });
     }
   },
   adminLogout: async () => {
     try {
-      const res = await axios.post("/admin-logout");
+      const res = await axios.post("/auth/admin-logout");
       if (res?.data?.success) {
         localStorage.removeItem("ecom-admin");
         set({ admin: null });

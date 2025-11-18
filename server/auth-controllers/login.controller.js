@@ -16,6 +16,8 @@ const loginController = async (req, res) => {
     if (!isHashedMatched) throw new Error("Wrong Email Address Or Password");
     if (isHashedMatched && isEmailExist?.email === email) {
       let user = await userModel.findOne({ email }).select("-password");
+      if (user.role === "USER")
+        throw new Error("You aren't an admin - access denied");
       const token = await createJWT({ _id: user._id, name: user.name, email });
       setCookie(res, token);
       return res.status(200).json({

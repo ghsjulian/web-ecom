@@ -1,5 +1,5 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import "../styles/app.layout.css";
 import Header from "./Header";
 import Sidebar from "./Sidebar";

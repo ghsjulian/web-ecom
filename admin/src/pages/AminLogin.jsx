@@ -43,6 +43,7 @@ const AdminLogin = () => {
     //console.log("Okay...");
     await loginNow({ email, password }, showMessage, navigate);
   };
+  document.title = "Admin login | Access the admin dashboard";
 
   return (
     <div className="login-container">
@@ -77,8 +78,12 @@ const AdminLogin = () => {
           <label htmlFor="remember">Remember me</label>
         </div>
 
-        <button onClick={handleSubmit} className="login-btn">
-          Sign In
+        <button
+          onClick={handleSubmit}
+          disabled={isSigningIn}
+          className="login-btn"
+        >
+          {isSigningIn ? "Processing..." : "Sign In"}
         </button>
       </form>
 

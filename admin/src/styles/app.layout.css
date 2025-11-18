@@ -43,6 +43,35 @@ body {
   background: linear-gradient(180deg, #f6f8fb 0%, #eef3fb 100%);
   color: var(--text);
 }
+.loader-container {
+  position: relative;
+  width: var(--max-w);
+  height: var(--max-h);
+  background: var(--app-bg);
+  box-shadow: var(--app-shadow);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: 0.3s ease-in all;
+}
+.loader-container img {
+  width: 40%;
+  height: 40%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  margin-bottom: 6rem;
+}
+.loader-container h2 {
+  position: absolute;
+  left: 0;
+  right: 0;
+  color: #054964;
+  font-weight: 500;
+  text-align: center;
+  margin: 0.5rem auto;
+}
 .app {
   position: relative;
   width: var(--max-w);
