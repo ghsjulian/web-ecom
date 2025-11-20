@@ -1,4 +1,4 @@
-// ---------------------- REQUIRE ALL PACKAGES ----------------------
+// ---------------------- REQUIRE ALL PACKAGES ----------------------//
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
@@ -18,7 +18,7 @@ const HOST = process.env.HOST || "127.0.0.1";
 app.use(helmet());
 // Log HTTP requests (only in development)
 if (process.env.NODE_ENV !== "production") {
-    app.use(morgan("dev"));
+  app.use(morgan("dev"));
 }
 
 // Parse JSON and cookies
@@ -28,13 +28,13 @@ app.use(cookieParser());
 
 // Enable CORS for frontend domain
 app.use(
-    cors({
-        origin: "http://localhost:5001",
-        methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
-        maxAge: 86400
-    })
+  cors({
+    origin: "http://localhost:5001",
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    maxAge: 86400,
+  })
 );
 
 // Gzip compression for performance
@@ -44,21 +44,21 @@ app.use(compression());
 const adminPath = path.join(__dirname, "../frontend/dist/");
 app.use("/admin", express.static(adminPath));
 app.get("/admin", (req, res) => {
-    res.sendFile(adminPath + "index.html");
+  res.sendFile(adminPath + "index.html");
 });
 
 app.get("/", (req, res) => {
-    res.send("🚀 Server is running successfully!");
+  res.send("🚀 Server is running successfully!");
 });
 
 // ---------------------- ERROR HANDLING ----------------------
 app.use((err, req, res, next) => {
-    console.error("❌ Error:", err.message);
-    res.status(500).json({
-        success: false,
-        err,
-        message: "Internal Server Error"
-    });
+  console.error("❌ Error:", err.message);
+  res.status(500).json({
+    success: false,
+    err,
+    message: "Internal Server Error",
+  });
 });
 
 if (process.env.NODE_ENV !== "production") console.clear();
@@ -67,12 +67,12 @@ app.use("/api/v1", require("./routes/auth.routes"));
 
 // ---------------------- START SERVER ----------------------
 createConnection()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log("\n[+] Express Server Running!");
-            console.log(`\n[+] Host:${HOST}\n`);
-        });
-    })
-    .catch(err => {
-        console.error("❌ Database connection failed:", err.message);
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log("\n[+] Express Server Running!");
+      console.log(`\n[+] Host:${HOST}\n`);
     });
+  })
+  .catch((err) => {
+    console.error("❌ Database connection failed:", err.message);
+  });

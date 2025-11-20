@@ -1,20 +1,13 @@
----
 
-# 🚀 Echoda — Modern Full-Stack Web Application
 
-![License](https://img.shields.io/github/license/ghsjulian/echoda)
-![Node](https://img.shields.io/badge/Node.js-18.x-green?logo=node.js)
-![React](https://img.shields.io/badge/React-18.x-blue?logo=react)
-![MongoDB](https://img.shields.io/badge/MongoDB-6.x-success?logo=mongodb)
-![Express](https://img.shields.io/badge/Express.js-latest-lightgrey?logo=express)
-![Status](https://img.shields.io/badge/Status-In%20Development-orange)
+### 🚀E-Commerce Admin Panel— Modern Full-Stack Web Application
 
 
 ---
 
 ## 🏢 Project Overview
 
-**Echoda** is a modern, production-ready full-stack web application built using the **MERN stack (MongoDB, Express.js, React, Node.js)**.  
+**E Commerce** is a modern, production-ready full-stack web application built using the **MERN stack (MongoDB, Express.js, React, Node.js)**.  
 It is designed with scalability, security, and performance in mind — optimized for both developers and users with smooth UI/UX and robust backend architecture.
 
 ---
@@ -40,11 +33,11 @@ It is designed with scalability, security, and performance in mind — optimized
 ```
 
 echoda/
-├── client/              # React frontend
+admin                # React frontend
 │   ├── src/
 │   ├── public/
 │   └── package.json
-├── server/              # Express backend
+server               # Express
 │   ├── routes/
 │   ├── controllers/
 │   ├── models/

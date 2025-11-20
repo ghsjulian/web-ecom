@@ -1,0 +1,4 @@
+How to install linux and what is linux ?
+=> Linux is an open source free tools  which can install in a machine and perform various kinds of task.
+It is free and anyone can use it inside their window, MAC, and others oparating systems.
+It has a carnel based tolls, But it's also offer a gui interface for better user experience.
