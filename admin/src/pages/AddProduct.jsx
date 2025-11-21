@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/add-product.css";
 import useProduct from "../store/useProduct";
 
 const AddProduct = () => {
+  const navigate = useNavigate();
   const { isCreatingProduct, createNewProduct } = useProduct();
   const [formData, setFormData] = useState({
     productName: "",
@@ -28,7 +30,9 @@ const AddProduct = () => {
       imagePreviews.forEach((url) => {
         try {
           URL.revokeObjectURL(url);
-        } catch (err) {}
+        } catch (err) {
+          console.log(err);
+        }
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,7 +84,9 @@ const AddProduct = () => {
     imagePreviews.forEach((url) => {
       try {
         URL.revokeObjectURL(url);
-      } catch (err) {}
+      } catch (err) {
+        console.log(err);
+      }
     });
 
     // Generate preview URLs for all images
@@ -99,7 +105,9 @@ const AddProduct = () => {
     // Revoke selected object URL
     try {
       URL.revokeObjectURL(newPreviews[idx]);
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
 
     newImages.splice(idx, 1);
     newPreviews.splice(idx, 1);
@@ -149,7 +157,7 @@ const AddProduct = () => {
 
       // Call store action
       // If your createNewProduct expects something else (like FormData), adapt accordingly.
-      createNewProduct(payload);
+      createNewProduct(payload, navigate);
 
       console.log("Publishing Product:", payload);
       alert("✅ Product Published Successfully!");

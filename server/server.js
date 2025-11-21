@@ -64,6 +64,8 @@ app.use((err, req, res, next) => {
 if (process.env.NODE_ENV !== "production") console.clear();
 // ---------------------- APIs Will Be Defined Here ----------------------
 app.use("/api/v1", require("./routes/auth.routes"));
+// Product Routes Here
+app.use("/api/v1/admin/product", require("./routes/product.routes"));
 
 // ---------------------- START SERVER ----------------------
 createConnection()
