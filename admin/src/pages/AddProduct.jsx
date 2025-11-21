@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/add-product.css";
+import useProduct from "../store/useProduct";
 
 const AddProduct = () => {
+  const { isCreatingProduct, createNewProduct } = useProduct();
   const [formData, setFormData] = useState({
     productName: "",
     sku: "",
@@ -13,10 +15,42 @@ const AddProduct = () => {
     lowStock: "10",
     shortDesc: "",
     fullDesc: "",
-    images: [],
+    images: [], // File objects
   });
 
-  const [imagePreviews, setImagePreviews] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]); // object URLs
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    // cleanup object URLs on unmount
+    return () => {
+      mountedRef.current = false;
+      imagePreviews.forEach((url) => {
+        try {
+          URL.revokeObjectURL(url);
+        } catch (err) {}
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Convert a single File -> base64 data URL
+  const fileToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (err) => reject(err);
+    });
+
+  // Convert all File objects -> array of base64 strings
+  const convertImagesToBase64 = async (images) => {
+    // images: array of File
+    if (!images || images.length === 0) return [];
+    // convert in parallel
+    const promises = images.map((f) => fileToBase64(f));
+    return Promise.all(promises);
+  };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -26,7 +60,7 @@ const AddProduct = () => {
 
   // Handle file upload + preview
   const handleImageUpload = (e) => {
-    const newFiles = Array.from(e.target.files);
+    const newFiles = Array.from(e.target.files || []);
 
     // Combine old + new images (but max 6)
     const combined = [...formData.images, ...newFiles].slice(0, 6);
@@ -42,12 +76,36 @@ const AddProduct = () => {
       alert("Some images exceeded 5MB limit!");
     }
 
-    // Update form data
-    setFormData((prev) => ({ ...prev, images: filtered }));
+    // Revoke previous previews to avoid leaks
+    imagePreviews.forEach((url) => {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (err) {}
+    });
 
     // Generate preview URLs for all images
     const previews = filtered.map((file) => URL.createObjectURL(file));
+
+    // Update states
+    setFormData((prev) => ({ ...prev, images: filtered }));
     setImagePreviews(previews);
+  };
+
+  // Remove an image by index
+  const handleRemoveImage = (idx) => {
+    const newImages = [...formData.images];
+    const newPreviews = [...imagePreviews];
+
+    // Revoke selected object URL
+    try {
+      URL.revokeObjectURL(newPreviews[idx]);
+    } catch (err) {}
+
+    newImages.splice(idx, 1);
+    newPreviews.splice(idx, 1);
+
+    setFormData((prev) => ({ ...prev, images: newImages }));
+    setImagePreviews(newPreviews);
   };
 
   // Function to check required fields
@@ -72,22 +130,54 @@ const AddProduct = () => {
   };
 
   // Handle form submit (Publish)
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid()) {
       alert("⚠️ Please fill all required fields before publishing!");
       return;
     }
 
-    console.log("Publishing Product:", formData);
-    alert("✅ Product Published Successfully!");
+    try {
+      // Convert all images to Base64
+      const base64Images = await convertImagesToBase64(formData.images);
+
+      // New final payload
+      const payload = {
+        ...formData,
+        images: base64Images, // now base64 strings
+      };
+
+      // Call store action
+      // If your createNewProduct expects something else (like FormData), adapt accordingly.
+      createNewProduct(payload);
+
+      console.log("Publishing Product:", payload);
+      alert("✅ Product Published Successfully!");
+    } catch (err) {
+      console.error("Error converting images to Base64:", err);
+      alert("❌ Failed to convert images. Try again.");
+    }
   };
 
   // Save Draft
-  const handleSaveDraft = (e) => {
+  const handleSaveDraft = async (e) => {
     e.preventDefault();
-    console.log("Draft Saved:", formData);
-    alert("📝 Draft Saved Successfully!");
+    try {
+      const base64Images = await convertImagesToBase64(formData.images);
+
+      const payload = {
+        ...formData,
+        images: base64Images,
+      };
+
+      // If you want to persist drafts via createNewProduct, call it here with a draft flag:
+      // createNewProduct({ ...payload, draft: true });
+      console.log("Draft Saved:", payload);
+      alert("📝 Draft Saved Successfully!");
+    } catch (err) {
+      console.error("Error converting images for draft:", err);
+      alert("❌ Failed to save draft due to image conversion error.");
+    }
   };
 
   return (
@@ -99,13 +189,18 @@ const AddProduct = () => {
             <button className="btn btn-secondary" onClick={handleSaveDraft}>
               <i className="fas fa-save"></i> Save Draft
             </button>
-            <button className="btn btn-primary" onClick={handleSubmit}>
-              <i className="fas fa-paper-plane"></i> Publish
+            <button
+              className="btn btn-primary"
+              onClick={handleSubmit}
+              disabled={isCreatingProduct}
+            >
+              <i className="fas fa-paper-plane"></i>{" "}
+              {isCreatingProduct ? "Please Wait..." : "Publish"}
             </button>
           </div>
         </div>
 
-        <form id="addProductForm">
+        <form id="addProductForm" onSubmit={(e) => e.preventDefault()}>
           <div className="form-grid">
             <div className="form-group">
               <label htmlFor="productName">
@@ -278,23 +373,7 @@ const AddProduct = () => {
                       type="button"
                       className="remove-btn"
                       title="Remove Image"
-                      onClick={() => {
-                        // Remove image at current index
-                        const newImages = [...formData.images];
-                        const newPreviews = [...imagePreviews];
-
-                        // Revoke the object URL to avoid memory leaks
-                        URL.revokeObjectURL(newPreviews[idx]);
-
-                        newImages.splice(idx, 1);
-                        newPreviews.splice(idx, 1);
-
-                        // Update both states together
-                        setFormData((prev) => ({ ...prev, images: newImages }));
-                        setImagePreviews(newPreviews);
-
-                        console.log("Updated images:", newImages);
-                      }}
+                      onClick={() => handleRemoveImage(idx)}
                     >
                       ×
                     </button>

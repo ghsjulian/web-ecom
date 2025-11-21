@@ -1,42 +1,42 @@
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
 });
 
-// 🔹 Upload Function
-const Uploader = async (imgPath, id) => {
-    try {
-        const results = await cloudinary.uploader.upload(imgPath, {
-            folder: "echoda-web",
-            public_id: id
-        });
-        return results;
-    } catch (error) {
-        console.log("Error in Uploader -", error);
-        throw error;
-    }
+const getString = () => {
+  const randomNumber = Math.floor(1000000000 + Math.random() * 9000000000);
+  return "product---" + randomNumber.toString();
 };
 
-
-
+// 🔹 Upload Function
+const Uploader = async (imgPath) => {
+  try {
+    const results = await cloudinary.uploader.upload(imgPath, {
+      folder: "ecom-assets",
+      public_id: getString(),
+    });
+    return results;
+  } catch (error) {
+    console.log("Error in Uploader -", error);
+    throw error;
+  }
+};
 
 // 🔹 Delete Function
-const DeleteFile = async publicId => {
-    try {
-        const result = await cloudinary.uploader.destroy(publicId);
-        console.log("Deleted from Cloudinary:", result);
-        return result;
-    } catch (error) {
-        console.log("Error in DeleteFile -", error);
-        throw error;
-    }
+const DeleteFile = async (publicId) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    console.log("Deleted from Cloudinary:", result);
+    return result;
+  } catch (error) {
+    console.log("Error in DeleteFile -", error);
+    throw error;
+  }
 };
-
-
 
 const uploadBase64PDF = async (base64String) => {
   if (!base64String.startsWith("data:application/pdf;base64,")) {
@@ -46,8 +46,8 @@ const uploadBase64PDF = async (base64String) => {
   return await cloudinary.uploader.upload(base64String, {
     resource_type: "raw",
     folder: "pdf_uploads",
-    format: "pdf",        
-    public_id: `pdf_${Date.now()}`
+    format: "pdf",
+    public_id: `pdf_${Date.now()}`,
   });
 };
 
@@ -55,7 +55,4 @@ const deletePDF = async (publicId) => {
   return await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
 };
 
-module.exports = { Uploader, DeleteFile,deletePDF,uploadBase64PDF };
-
-
-
+module.exports = { Uploader, DeleteFile, deletePDF, uploadBase64PDF };
