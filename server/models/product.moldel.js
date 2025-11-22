@@ -41,7 +41,6 @@ const productSchema = new Schema(
     category: {
       type: String,
       required: [true, "Category is required"],
-      enum: ["smartphones", "laptops", "accessories", "audio", "wearables"],
       lowercase: true,
       index: true,
     },
@@ -56,46 +55,30 @@ const productSchema = new Schema(
 
     price: {
       type: Number,
-      required: [true, "Price is required"],
-      min: [0, "Price cannot be negative"],
     },
 
     salePrice: {
-      type: Number,
-      min: [0, "Sale price cannot be negative"],
-      validate: {
-        validator: function (v) {
-          // if salePrice exists, it should be <= price (optional)
-          if (v == null) return true;
-          return this.price == null ? true : v <= this.price;
-        },
-        message: "Sale price must be less than or equal to regular price",
-      },
+      type: Number
     },
 
     stock: {
       type: Number,
-      required: [true, "Stock quantity is required"],
-      min: [0, "Stock cannot be negative"],
       default: 0,
     },
 
     lowStock: {
       type: Number,
-      min: [0, "Low stock alert cannot be negative"],
-      default: 10,
+      default: 1,
     },
 
     shortDesc: {
       type: String,
       trim: true,
-      maxlength: [160, "Short description cannot exceed 160 characters"],
       default: "",
     },
 
     fullDesc: {
       type: String,
-      required: [true, "Full description is required"],
     },
 
     /**
@@ -105,15 +88,7 @@ const productSchema = new Schema(
      *   - Or remote URLs (if you later store on CDN)
      */
     images: {
-      type: [String],
-      validate: [
-        {
-          validator: function (arr) {
-            return arr.length <= 6;
-          },
-          message: "Maximum 6 images allowed",
-        },
-      ],
+      type: [],
       default: [],
     },
 
