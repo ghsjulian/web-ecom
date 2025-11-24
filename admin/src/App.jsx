@@ -14,6 +14,7 @@ import Signup from "./pages/Signup";
 import UsersPage from "./pages/UsersPage";
 import ViewUser from "./pages/ViewUser";
 import AddProduct from "./pages/AddProduct";
+import EditProduct from "./pages/EditProduct";
 import Analytics from "./pages/Analytics";
 import Overview from "./pages/Overview";
 import ProductsPage from "./pages/ProductsPage";
@@ -54,6 +55,7 @@ const App = () => {
               <Route path="customers" element={<UsersPage />} />
               <Route path="billing-info" element={<BillingInfo />} />
               <Route path="add-product" element={<AddProduct />} />
+              <Route path="edit-product" element={<EditProduct />} />
             </Route>
             <Route
               path="/admin-login"

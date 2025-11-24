@@ -91,7 +91,7 @@ const Signup = () => {
           onClick={handleSubmit}
           className="login-btn"
         >
-          Sign In
+          Create User
         </button>
       </form>
 

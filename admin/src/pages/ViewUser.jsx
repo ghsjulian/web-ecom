@@ -1,5 +1,5 @@
 import React from "react";
-//import "../styles/view-user.css";
+import "../styles/view-user.css";
 
 const ViewUser = () => {
   return (

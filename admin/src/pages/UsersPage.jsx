@@ -1,7 +1,9 @@
 import React from "react";
-//import "../styles/orders.style.css";
+import "../styles/orders.style.css";
+import { useNavigate } from "react-router-dom";
 
 const UsersPage = () => {
+  const navigate = useNavigate();
   return (
     <div className="container">
       <div id="users" className="tab-content active">
@@ -9,7 +11,7 @@ const UsersPage = () => {
           <h2 className="section-title">
             <i className="fas fa-users"></i> Manage Users
           </h2>
-          <button className="add-btn">
+          <button onClick={() => navigate("/create-user")} className="add-btn">
             <i className="fas fa-plus"></i> Add User
           </button>
         </div>
