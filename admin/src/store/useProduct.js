@@ -88,6 +88,15 @@ const useProduct = create((set, get) => ({
       set({ fetchingProducts: false });
     }
   },
+  getSingleProduct: async (id) => {
+    try {
+      const response = await axios.get("/admin/product/get-product?id=" + id);
+      console.log(response.data);
+      set({ singleProduct: response?.data?.product });
+    } catch (error) {
+      console.log(error);
+    }
+  },
 }));
 
 export default useProduct;
