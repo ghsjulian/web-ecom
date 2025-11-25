@@ -8,6 +8,8 @@ const useProduct = create((set, get) => ({
   createError: null,
   products: [],
   fetchingProducts: false,
+  singleProduct: {},
+  isgetProduct: false,
 
   createNewProduct: async (data = {}, navigate) => {
     set({ isCreatingProduct: true, createPercent: 0, createError: null });
@@ -90,11 +92,14 @@ const useProduct = create((set, get) => ({
   },
   getSingleProduct: async (id) => {
     try {
+      set({ isgetProduct: true });
       const response = await axios.get("/admin/product/get-product?id=" + id);
       console.log(response.data);
       set({ singleProduct: response?.data?.product });
     } catch (error) {
       console.log(error);
+    } finally {
+      set({ isgetProduct: false });
     }
   },
 }));

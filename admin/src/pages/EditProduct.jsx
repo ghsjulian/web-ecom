@@ -11,8 +11,14 @@ const EditProduct = () => {
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("productId");
 
-  const { isCreatingProduct, products, createNewProduct, fetchProducts } =
-    useProduct();
+  const {
+    isCreatingProduct,
+    products,
+    createNewProduct,
+    fetchProducts,
+    getSingleProduct,
+    singleProduct,
+  } = useProduct();
 
   const [formData, setFormData] = useState({
     productName: "",
@@ -434,4 +440,3 @@ const EditProduct = () => {
 };
 
 export default EditProduct;
- 
