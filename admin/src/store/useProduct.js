@@ -10,6 +10,7 @@ const useProduct = create((set, get) => ({
   fetchingProducts: false,
   singleProduct: {},
   isgetProduct: false,
+  isupdatingProduct: false,
 
   createNewProduct: async (data = {}, navigate) => {
     set({ isCreatingProduct: true, createPercent: 0, createError: null });
@@ -46,6 +47,7 @@ const useProduct = create((set, get) => ({
       // small delay so UI can show 100%
       setTimeout(() => set({ createPercent: 0 }), 600);
       alert(resp.message || "Product created successfully");
+      navigate("/products");
       // return resp.product || resp.data || resp;
       console.log(resp);
     } catch (error) {
@@ -55,7 +57,38 @@ const useProduct = create((set, get) => ({
       alert(msg);
       throw error; // rethrow so caller can also handle
     } finally {
-      set({ isCreatingProduct: false });
+      set({ isupdatingProduct: false });
+    }
+  },
+  updateProduct: async (id, data = {}, navigate) => {
+    set({ isupdatingProduct: true, createError: null });
+    try {
+      const res = await axios.put(
+        "/admin/product/update-product?id=" + id,
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      // normalize response
+      const resp = res?.data;
+      if (!resp) throw new Error("No response from server");
+      if (!resp.success) {
+        set({ createError: resp.message || "Failed to create product" });
+        alert(resp.message || "Failed to create product");
+        return null;
+      }
+      alert(resp.message || "Product Updated successfully");
+      navigate("/products");
+      // console.log(resp);
+    } catch (error) {
+      const msg =
+        error?.response?.data?.message || error.message || "Unknown error";
+      set({ createError: msg });
+      alert(msg);
+      throw error; // rethrow so caller can also handle
+    } finally {
+      set({ isupdatingProduct: false });
     }
   },
   getAllProducts: async () => {
