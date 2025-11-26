@@ -78,14 +78,14 @@ const useProduct = create((set, get) => ({
         alert(resp.message || "Failed to create product");
         return null;
       }
-      alert(resp.message || "Product Updated successfully");
+      // alert(resp.message || "Product Updated successfully");
       navigate("/products");
       // console.log(resp);
     } catch (error) {
       const msg =
         error?.response?.data?.message || error.message || "Unknown error";
       set({ createError: msg });
-      alert(msg);
+      // alert(msg);
       throw error; // rethrow so caller can also handle
     } finally {
       set({ isupdatingProduct: false });

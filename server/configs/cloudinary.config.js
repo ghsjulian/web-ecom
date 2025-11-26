@@ -27,7 +27,7 @@ const Uploader = async (imgPath) => {
 };
 
 // 🔹 Delete Function
-const DeleteFile = async (publicId) => {
+const Destroyer = async (publicId) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
     console.log("Deleted from Cloudinary:", result);
@@ -55,4 +55,4 @@ const deletePDF = async (publicId) => {
   return await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
 };
 
-module.exports = { Uploader, DeleteFile, deletePDF, uploadBase64PDF };
+module.exports = { Uploader, Destroyer, deletePDF, uploadBase64PDF };

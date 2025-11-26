@@ -1,3 +1,4 @@
+// EditProduct.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/add-product.css";
@@ -14,7 +15,7 @@ const EditProduct = () => {
   const {
     getSingleProduct,
     singleProduct,
-    isgetProduct, // optional, code will work without it
+    isgetProduct, // optional
     updateProduct,
     isupdatingProduct,
   } = useProduct();
@@ -32,10 +33,12 @@ const EditProduct = () => {
     lowStock: "10",
     shortDesc: "",
     fullDesc: "",
-    images: [], // mix of string URLs or File objects
+    images: [], // mix: {id,url} | "https://..." | File/Blob | base64 string
   });
 
-  // imagePreviews correspond index wise to formData.images
+  // imagePreviews is an array of preview URLs (strings):
+  // - for remote images: their http(s) url
+  // - for newly added files: blob: URLs created from Files
   const [imagePreviews, setImagePreviews] = useState([]);
 
   // Fetch product when productId becomes available
@@ -47,15 +50,11 @@ const EditProduct = () => {
 
   // Populate form when singleProduct updates
   useEffect(() => {
-    // avoid running on first render if not mounted yet
     if (!productId) return;
-
-    // If the store tracks fetch completion, you can guard on isgetProduct
-    // if (typeof isgetProduct !== "undefined" && !isgetProduct) return;
 
     const product = singleProduct;
     if (!product) {
-      // Clear form if no product
+      // clear
       setFormData({
         productName: "",
         sku: "",
@@ -69,7 +68,7 @@ const EditProduct = () => {
         fullDesc: "",
         images: [],
       });
-      // revoke any existing blob URLs
+      // revoke any blob previews
       imagePreviews.forEach((url) => {
         try {
           if (typeof url === "string" && url.startsWith("blob:")) {
@@ -81,13 +80,21 @@ const EditProduct = () => {
       return;
     }
 
-    // build images array (strings for remote URLs)
-    const images =
-      (product.images || []).map((img) =>
-        typeof img === "string" ? img : img?.url ? img.url : img
-      ) || [];
+    // product.images may be an array of:
+    // - string URL
+    // - object { id, url }
+    // - maybe base64 (rare)
+    const images = Array.isArray(product.images) ? product.images : [];
 
-    // revoke previous blob previews (we will replace previews)
+    // build initial previews array (strings)
+    const previews = images.map((it) => {
+      if (!it) return "";
+      if (typeof it === "string") return it;
+      if (typeof it === "object" && it.url) return it.url;
+      return "";
+    });
+
+    // revoke previous blob previews
     imagePreviews.forEach((url) => {
       try {
         if (typeof url === "string" && url.startsWith("blob:")) {
@@ -107,16 +114,14 @@ const EditProduct = () => {
       lowStock: product.lowStock ?? "10",
       shortDesc: product.shortDesc ?? "",
       fullDesc: product.fullDesc ?? "",
-      images: images,
+      images: images, // preserve original items (object/string)
     });
 
-    // previews initially same as remote URLs (no blob URLs yet)
-    setImagePreviews(images);
-
+    setImagePreviews(previews);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [singleProduct, productId]);
 
-  // cleanup on unmount: revoke any blob urls
+  // cleanup on unmount
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -149,17 +154,19 @@ const EditProduct = () => {
       return;
     }
 
+    // only accept files under MAX_FILE_SIZE
     const allowed = incomingFiles
       .filter((f) => f.size <= MAX_FILE_SIZE)
       .slice(0, slotsLeft);
 
-    const existingKeys = formData.images
-      .filter((i) => typeof i !== "string")
+    // dedupe by name+size against existing File/Blob entries in formData.images
+    const existingFileKeys = formData.images
+      .filter((i) => i instanceof Blob)
       .map((f) => `${f.name}_${f.size}`);
 
     const toAdd = allowed.filter((f) => {
       const key = `${f.name}_${f.size}`;
-      return !existingKeys.includes(key);
+      return !existingFileKeys.includes(key);
     });
 
     if (toAdd.length === 0) {
@@ -167,6 +174,7 @@ const EditProduct = () => {
       return;
     }
 
+    // create blob previews for new files
     const newBlobPreviews = toAdd.map((f) => URL.createObjectURL(f));
 
     const newImagesArray = [...formData.images, ...toAdd].slice(0, MAX_IMAGES);
@@ -203,18 +211,65 @@ const EditProduct = () => {
     setImagePreviews(newPreviews);
   };
 
+  // Convert File/Blob to base64, or pass through string/object
   const fileToBase64 = (file) =>
     new Promise((resolve, reject) => {
-      if (typeof file === "string") return resolve(file); // already a URL or base64
+      // If it's already a string (could be base64 or URL), pass through
+      if (typeof file === "string") return resolve(file);
+
+      // If it's an object that isn't a Blob/File (e.g. {id,url}), pass through
+      if (typeof file === "object" && !(file instanceof Blob))
+        return resolve(file);
+
+      // For File/Blob -> convert to base64
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result);
       reader.onerror = (err) => reject(err);
     });
 
-  const convertImagesToBase64 = async (images) => {
+  /**
+   * Prepare images for payload:
+   * - File/Blob -> convert to base64 string
+   * - base64 string -> keep as-is
+   * - plain url string -> convert to { url }
+   * - object (e.g. { id, url }) -> keep as-is
+   */
+  const prepareImagesForSubmit = async (images) => {
     if (!images || images.length === 0) return [];
-    return Promise.all(images.map((f) => fileToBase64(f)));
+
+    const out = [];
+    for (const img of images) {
+      // newly added file/blob
+      if (img instanceof Blob) {
+        const b64 = await fileToBase64(img);
+        out.push(b64);
+        continue;
+      }
+
+      // base64 string (already)
+      if (typeof img === "string" && img.startsWith("data:image")) {
+        out.push(img);
+        continue;
+      }
+
+      // plain URL string
+      if (typeof img === "string" && /^https?:\/\//i.test(img)) {
+        out.push({ url: img });
+        continue;
+      }
+
+      // object (preserve e.g., { id, url })
+      if (typeof img === "object" && img !== null) {
+        out.push(img);
+        continue;
+      }
+
+      // skip bad entries
+      console.warn("Skipping invalid image entry:", img);
+    }
+
+    return out;
   };
 
   const isFormValid = () => {
@@ -240,14 +295,19 @@ const EditProduct = () => {
     }
 
     try {
-      const base64Images = await convertImagesToBase64(formData.images);
+      // Prepare images: new Files => base64, existing objects => preserved, urls => {url}
+      const imagesPayload = await prepareImagesForSubmit(formData.images);
+
+      // final payload
       const payload = {
         ...formData,
-        images: base64Images,
+        images: imagesPayload,
         _id: productId,
       };
+
+      // call your store action: updateProduct(productId, payload, navigate)
       await updateProduct(productId, payload, navigate);
-      // alert("✅ Product updated successfully!");
+      // store may handle navigation / toast; optionally you can show message
     } catch (err) {
       console.error(err);
       alert("❌ Failed to update product.");
@@ -260,39 +320,23 @@ const EditProduct = () => {
         <div className="form-header">
           <h2 className="form-title">Edit Product</h2>
           <div className="form-actions">
-            {/* <button
-              className="btn btn-primary"
-              onClick={handleSubmit}
-              disabled={isCreatingProduct}
-              type="button"
-            >
-              {isCreatingProduct ? (
-                <>
-                  <div className="loading" />
-                  <span className="loading-text"> Please Wait</span>
-                </>
-              ) : (
-                <>
-                  <i className="fas fa-paper-plane" /> Update
-                </>
-              )}
-            </button> */}
             <button
               onClick={handleSubmit}
               disabled={isupdatingProduct}
               className={
                 isupdatingProduct ? "loading-btn loading" : "loading-btn"
               }
+              type="button"
             >
               {isupdatingProduct ? (
                 <>
-                  <div className="spinner"></div>
+                  <div className="spinner" />
                   <span className="loading-text">Please wait...</span>
                 </>
               ) : (
                 <>
-                  <i className="fas fa-paper-plane"></i>
-                  <span className="loading-text">Publish</span>
+                  <i className="fas fa-paper-plane" />
+                  <span className="loading-text">Update</span>
                 </>
               )}
             </button>
