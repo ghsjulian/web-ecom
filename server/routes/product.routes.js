@@ -5,10 +5,12 @@ const updateProductController = require("../product-controllers/update-product.c
 const createProductController = require("../product-controllers/create-product.controller");
 const getAllProducts = require("../product-controllers/get-all-products.controller");
 const getSingleProduct = require("../product-controllers/get-single-product.controller");
+const getFilteredProducts = require("../product-controllers/filtered-product.controller");
 
 router.post("/create-product", isAdmin, createProductController);
 router.put("/update-product", isAdmin, updateProductController);
-router.get("/get-all-products", isAdmin, getAllProducts);
+// router.get("/get-all-products", isAdmin, getAllProducts);
+router.get("/get-all-products", isAdmin, getFilteredProducts);
 router.get("/get-product", isAdmin, getSingleProduct);
 
 module.exports = router;

@@ -45,27 +45,44 @@ const updateProduct = async (req, res) => {
 
     // ---------- Basic Validation ----------
     if (!productName)
-      return res.status(400).json({ error: "productName is required" });
-    if (!sku) return res.status(400).json({ error: "sku is required" });
+      return res
+        .status(400)
+        .json({ success: false, error: "productName is required" });
+    if (!sku)
+      return res.status(400).json({ success: false, error: "sku is required" });
     if (!category)
-      return res.status(400).json({ error: "category is required" });
+      return res
+        .status(400)
+        .json({ success: false, error: "category is required" });
     if (price === undefined || price === null || isNaN(Number(price)))
-      return res.status(400).json({ error: "price must be a valid number" });
+      return res
+        .status(400)
+        .json({ success: false, error: "price must be a valid number" });
     if (stock === undefined || stock === null || isNaN(Number(stock)))
-      return res.status(400).json({ error: "stock must be a valid number" });
+      return res
+        .status(400)
+        .json({ success: false, error: "stock must be a valid number" });
     if (!fullDesc)
-      return res.status(400).json({ error: "fullDesc is required" });
+      return res
+        .status(400)
+        .json({ success: false, error: "fullDesc is required" });
 
     if (!Array.isArray(images) || images.length === 0)
-      return res.status(400).json({ error: "At least one image is required" });
+      return res
+        .status(400)
+        .json({ success: false, error: "At least one image is required" });
 
     if (images.length > 6)
-      return res.status(400).json({ error: "Maximum 6 images allowed" });
+      return res
+        .status(400)
+        .json({ success: false, error: "Maximum 6 images allowed" });
 
     // ---------- Find existing product ----------
     const existingProduct = await Product.findById(productId);
     if (!existingProduct)
-      return res.status(404).json({ error: "Product not found" });
+      return res
+        .status(404)
+        .json({ success: false, error: "Product not found" });
 
     // ---------- SKU uniqueness (exclude current product) ----------
     const skuUpper = sku.trim().toUpperCase();
@@ -74,9 +91,10 @@ const updateProduct = async (req, res) => {
       _id: { $ne: productId },
     });
     if (otherWithSku)
-      return res
-        .status(409)
-        .json({ error: "SKU already exists for another product" });
+      return res.status(409).json({
+        success: false,
+        error: "SKU already exists for another product",
+      });
 
     // ---------- Process incoming images ----------
     // Build finalImages as array of { id: string|null, url: string }
@@ -88,9 +106,10 @@ const updateProduct = async (req, res) => {
         const uploaded = await Uploader(img);
         if (!uploaded?.secure_url) {
           console.error("Uploader returned invalid response for base64 image");
-          return res
-            .status(500)
-            .json({ error: "Failed to upload one of the images" });
+          return res.status(500).json({
+            success: false,
+            error: "Failed to upload one of the images",
+          });
         }
         finalImages.push({
           id: uploaded.public_id || null,
@@ -129,9 +148,10 @@ const updateProduct = async (req, res) => {
             console.error(
               "Uploader returned invalid response for nested base64 image"
             );
-            return res
-              .status(500)
-              .json({ error: "Failed to upload one of the images" });
+            return res.status(500).json({
+              success: false,
+              error: "Failed to upload one of the images",
+            });
           }
           finalImages.push({
             id: uploaded.public_id || null,
@@ -149,7 +169,7 @@ const updateProduct = async (req, res) => {
       // if we reach here, the image entry is invalid
       return res
         .status(400)
-        .json({ error: "Invalid image entry in images array" });
+        .json({ success: false, error: "Invalid image entry in images array" });
     }
 
     // ---------- Deduplicate by url, preserve order ----------
@@ -164,13 +184,15 @@ const updateProduct = async (req, res) => {
     }
 
     if (dedupedImages.length === 0)
-      return res
-        .status(400)
-        .json({ error: "At least one valid image is required" });
+      return res.status(400).json({
+        success: false,
+        error: "At least one valid image is required",
+      });
     if (dedupedImages.length > 6)
-      return res
-        .status(400)
-        .json({ error: "Maximum 6 images allowed after processing" });
+      return res.status(400).json({
+        success: false,
+        error: "Maximum 6 images allowed after processing",
+      });
 
     // ---------- Determine removed images to delete from Cloudinary ----------
     // existingProduct.images may contain strings or objects.
@@ -264,12 +286,15 @@ const updateProduct = async (req, res) => {
     });
 
     return res.status(200).json({
+      success: true,
       message: "Product updated successfully",
       product: updated,
     });
   } catch (error) {
     console.error("Update Product Error:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
   }
 };
 

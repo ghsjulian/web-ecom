@@ -58,7 +58,7 @@ const productSchema = new Schema(
     },
 
     salePrice: {
-      type: Number
+      type: Number,
     },
 
     stock: {
@@ -96,6 +96,10 @@ const productSchema = new Schema(
       type: Boolean,
       default: false,
       index: true,
+    },
+    active: {
+      type: String,
+      default: "ACTIVE",
     },
 
     // optional reference to the user who created the product

@@ -2,39 +2,40 @@
 import { create } from "zustand";
 import axios from "../libs/axiosConfig";
 
+const DEFAULT_LIMIT = 5;
+
 const useProduct = create((set, get) => ({
+  // UI / loading state
   isCreatingProduct: false,
   createPercent: 0,
   createError: null,
+
   products: [],
   fetchingProducts: false,
+  total: 0,
+  page: 1,
+  pages: 1,
+
   singleProduct: {},
   isgetProduct: false,
   isupdatingProduct: false,
 
+  // Create product (unchanged logic except small fixes)
   createNewProduct: async (data = {}, navigate) => {
     set({ isCreatingProduct: true, createPercent: 0, createError: null });
     try {
       const res = await axios.post("/admin/product/create-product", data, {
         headers: { "Content-Type": "application/json" },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.lengthComputable) {
-            const p = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            set({ createPercent: p });
+        onUploadProgress: (p) => {
+          if (p.lengthComputable) {
+            const percent = Math.round((p.loaded * 100) / p.total);
+            set({ createPercent: percent });
           } else {
-            // fallback smooth increment if length not computable
-            set((s) => ({
-              createPercent: Math.min(
-                s.createPercent + Math.floor(Math.random() * 6) + 3,
-                95
-              ),
-            }));
+            set((s) => ({ createPercent: Math.min(s.createPercent + 5, 95) }));
           }
         },
       });
-      // normalize response
+
       const resp = res?.data;
       if (!resp) throw new Error("No response from server");
       if (!resp.success) {
@@ -42,24 +43,23 @@ const useProduct = create((set, get) => ({
         alert(resp.message || "Failed to create product");
         return null;
       }
-      // success
+
       set({ createPercent: 100 });
-      // small delay so UI can show 100%
-      setTimeout(() => set({ createPercent: 0 }), 600);
+      setTimeout(() => set({ createPercent: 0 }), 500);
       alert(resp.message || "Product created successfully");
       navigate("/products");
-      // return resp.product || resp.data || resp;
-      console.log(resp);
+      return resp;
     } catch (error) {
       const msg =
         error?.response?.data?.message || error.message || "Unknown error";
       set({ createError: msg });
       alert(msg);
-      throw error; // rethrow so caller can also handle
+      throw error;
     } finally {
-      set({ isupdatingProduct: false });
+      set({ isCreatingProduct: false });
     }
   },
+
   updateProduct: async (id, data = {}, navigate) => {
     set({ isupdatingProduct: true, createError: null });
     try {
@@ -70,67 +70,103 @@ const useProduct = create((set, get) => ({
           headers: { "Content-Type": "application/json" },
         }
       );
-      // normalize response
       const resp = res?.data;
       if (!resp) throw new Error("No response from server");
       if (!resp.success) {
-        set({ createError: resp.message || "Failed to create product" });
-        alert(resp.message || "Failed to create product");
+        set({ createError: resp.message || "Failed to update product" });
         return null;
       }
-      // alert(resp.message || "Product Updated successfully");
       navigate("/products");
-      // console.log(resp);
+      return resp;
     } catch (error) {
       const msg =
         error?.response?.data?.message || error.message || "Unknown error";
       set({ createError: msg });
-      // alert(msg);
-      throw error; // rethrow so caller can also handle
+      throw error;
     } finally {
       set({ isupdatingProduct: false });
     }
   },
-  getAllProducts: async () => {
-    // start loading
+
+  /**
+   * getAllProducts(filters)
+   * filters: { q, category, status, page, limit, sortBy, minPrice, maxPrice }
+   * default limit = 5 (server also defaults to 5)
+   */
+  getAllProducts: async (filters = {}) => {
     set({ fetchingProducts: true });
+
+    // Normalize filters: ensure numbers where needed
+    const params = { ...filters };
+    if (!params.limit) params.limit = DEFAULT_LIMIT;
+    if (!params.page) params.page = 1;
+
     try {
-      // use destructuring to get real response data and make logs clearer
-      const { data } = await axios.get("/admin/product/get-all-products");
+      const { data } = await axios.get("/admin/product/get-all-products", {
+        params,
+      });
 
-      // better checks: accept either `count` or `products` array length
-      const hasProducts =
-        (typeof data?.count === "number" && data.count > 0) ||
-        (Array.isArray(data?.products) && data.products.length > 0);
+      const success = !!data?.success;
+      const products = Array.isArray(data?.products) ? data.products : [];
+      const total =
+        typeof data?.total === "number"
+          ? data.total
+          : typeof data?.count === "number"
+          ? data.count
+          : products.length;
+      const page =
+        typeof data?.page === "number" ? data.page : Number(params.page) || 1;
+      const pages =
+        typeof data?.pages === "number"
+          ? data.pages
+          : Math.max(1, Math.ceil(total / Number(params.limit)));
 
-      if (data?.success && hasProducts) {
-        console.log("Products:", data.products);
-        set({ products: data.products });
+      if (success) {
+        set({ products, total, page, pages });
       } else {
-        // If API returns success but no products, clear products (optional)
-        console.log("No products returned from API:", data);
-        set({ products: [] });
+        // clear list on failure
+        set({ products: [], total: 0, page: 1, pages: 1 });
       }
+
+      return { success, products, total, page, pages };
     } catch (error) {
-      // improve error logging to include server response when available
       console.error(
         "getAllProducts error:",
         error.response?.data ?? error.message ?? error
       );
-      // optionally surface an error state in store, e.g. set({ productsError: true })
+      set({ products: [], total: 0, page: 1, pages: 1 });
+      throw error;
     } finally {
-      // stop loading — this must be false
       set({ fetchingProducts: false });
     }
   },
+
+  /**
+   * Convenience: searchProducts(query, extraFilters)
+   * Will call getAllProducts with q=query and page reset to 1 by default
+   */
+  searchProducts: async (query = "", extraFilters = {}) => {
+    const filters = {
+      ...extraFilters,
+      q: query?.trim?.() ?? "",
+      page: extraFilters.page ?? 1,
+      limit: extraFilters.limit ?? DEFAULT_LIMIT,
+    };
+    return get().getAllProducts(filters);
+  },
+
   getSingleProduct: async (id) => {
     try {
       set({ isgetProduct: true });
       const response = await axios.get("/admin/product/get-product?id=" + id);
-      console.log(response.data);
-      set({ singleProduct: response?.data?.product });
+      set({ singleProduct: response?.data?.product ?? {} });
+      return response?.data;
     } catch (error) {
-      console.log(error);
+      console.error(
+        "getSingleProduct error:",
+        error.response?.data ?? error.message ?? error
+      );
+      throw error;
     } finally {
       set({ isgetProduct: false });
     }

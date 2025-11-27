@@ -293,24 +293,18 @@ const EditProduct = () => {
       alert("⚠️ Please fill all required fields!");
       return;
     }
-
     try {
       // Prepare images: new Files => base64, existing objects => preserved, urls => {url}
       const imagesPayload = await prepareImagesForSubmit(formData.images);
-
       // final payload
       const payload = {
         ...formData,
         images: imagesPayload,
         _id: productId,
       };
-
-      // call your store action: updateProduct(productId, payload, navigate)
       await updateProduct(productId, payload, navigate);
-      // store may handle navigation / toast; optionally you can show message
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to update product.");
     }
   };
 
@@ -318,7 +312,7 @@ const EditProduct = () => {
     <div className="add-product">
       <div className="form-card">
         <div className="form-header">
-          <h2 className="form-title">Edit Product</h2>
+          <h2 className="form-title">Update Product</h2>
           <div className="form-actions">
             <button
               onClick={handleSubmit}
@@ -343,7 +337,7 @@ const EditProduct = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form id="addProductForm" onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Product Name *</label>
             <input

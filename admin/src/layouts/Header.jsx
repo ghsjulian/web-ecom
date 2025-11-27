@@ -3,6 +3,7 @@ import * as icons from "react-icons/fc";
 import { IoMdLogOut } from "react-icons/io";
 import { FaPowerOff } from "react-icons/fa";
 import useAuth from "../store/useAuth";
+import { BsBell } from "react-icons/bs";
 
 const Header = () => {
   const { adminLogout } = useAuth();
@@ -27,10 +28,10 @@ const Header = () => {
           title="Admin Profile"
           aria-label="Admin Profile"
         >
-          <icons.FcBusinessman size={24} />
+          <icons.FcBusinessman size={25} />
         </button>
-        <button className="icon-btn" title="Messages" aria-label="Messages">
-          <icons.FcInvite size={24} />
+        <button className="icon-btn" title="Notification" aria-label="Messages">
+          <BsBell size={23} color="#56adf5ff" />
         </button>
         <button
           onClick={adminLogout}
@@ -47,7 +48,7 @@ const Header = () => {
           title="Open menu"
           aria-hidden="true"
         >
-          <icons.FcMenu size={24} />
+          <icons.FcMenu size={23} />
         </label>
       </div>
     </header>

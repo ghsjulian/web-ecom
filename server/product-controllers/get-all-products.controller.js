@@ -6,7 +6,7 @@ const getAllProducts = async (req, res) => {
     const products = await productModel
       .find(filter)
       .sort({ createdAt: -1 }) // newest first
-      .limit(10)
+      .limit(5)
       .populate("createdBy", "name email") // optional: include creator short info
       .lean()
       .exec();

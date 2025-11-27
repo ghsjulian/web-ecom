@@ -121,6 +121,10 @@ header .top-left .search {
   background: transparent;
   padding: 0.5rem 1rem;
 }
+.search input:focus {
+  outline: none;
+  border: none;
+}
 .search button {
   padding: 0.5rem 0.3rem;
 }
