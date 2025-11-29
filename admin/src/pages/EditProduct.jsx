@@ -1,16 +1,16 @@
 // EditProduct.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "../styles/add-product.css";
 import useProduct from "../store/useProduct";
+import NotFound from "./NotFound";
 
 const MAX_IMAGES = 6;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const EditProduct = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const productId = searchParams.get("productId");
+  const { id } = useParams();
 
   const {
     getSingleProduct,
@@ -41,16 +41,16 @@ const EditProduct = () => {
   // - for newly added files: blob: URLs created from Files
   const [imagePreviews, setImagePreviews] = useState([]);
 
-  // Fetch product when productId becomes available
+  // Fetch product when id becomes available
   useEffect(() => {
-    if (!productId) return;
-    getSingleProduct(productId);
+    if (!id) return;
+    getSingleProduct(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
+  }, [id]);
 
   // Populate form when singleProduct updates
   useEffect(() => {
-    if (!productId) return;
+    if (!id) return;
 
     const product = singleProduct;
     if (!product) {
@@ -119,7 +119,7 @@ const EditProduct = () => {
 
     setImagePreviews(previews);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [singleProduct, productId]);
+  }, [singleProduct, id]);
 
   // cleanup on unmount
   useEffect(() => {
@@ -300,9 +300,9 @@ const EditProduct = () => {
       const payload = {
         ...formData,
         images: imagesPayload,
-        _id: productId,
+        _id: id,
       };
-      await updateProduct(productId, payload, navigate);
+      await updateProduct(id, payload, navigate);
     } catch (err) {
       console.error(err);
     }

@@ -9,8 +9,9 @@ import { MdDelete } from "react-icons/md";
 import { FiEye } from "react-icons/fi";
 import { TbPlayerTrackNext } from "react-icons/tb";
 import { GrChapterPrevious } from "react-icons/gr";
+import ProductsTableSkeleton from "../skeletons/ProductPageSkeleton";
 
-/* Debounce hook */
+/* Debounce hook left in place in case you want to reuse later (not used for Enter-search) */
 function useDebounce(value, delay = 300) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -34,7 +35,10 @@ const ProductsPage = () => {
 
   // UI filter state
   const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 350);
+  // Submitted query is the value used to actually trigger searches (on Enter)
+  const [submittedQuery, setSubmittedQuery] = useState("");
+  // optional: still available if you want to debounce submittedQuery in future
+  const debouncedSubmittedQuery = useDebounce(submittedQuery, 350);
 
   const [category, setCategory] = useState("All Categories");
   const [status, setStatus] = useState("All Status");
@@ -53,7 +57,7 @@ const ProductsPage = () => {
     if (typeof storePages === "number") setPages(storePages);
   }, [storePages]);
 
-  // Build filters
+  // Build filters; use debouncedSubmittedQuery so you can easily toggle debounce later.
   const buildFilters = useCallback(
     (opts = {}) => {
       const f = {
@@ -62,16 +66,16 @@ const ProductsPage = () => {
         sortBy: opts.sortBy ?? "-createdAt",
       };
 
-      if (debouncedSearch && debouncedSearch.trim())
-        f.q = debouncedSearch.trim();
+      if (debouncedSubmittedQuery && debouncedSubmittedQuery.trim())
+        f.q = debouncedSubmittedQuery.trim();
       if (category && category !== "All Categories") f.category = category;
       if (status && status !== "All Status") f.status = status;
       return { ...f, ...opts };
     },
-    [debouncedSearch, category, status, currentPage]
+    [debouncedSubmittedQuery, category, status, currentPage]
   );
 
-  // Initial + filters effect: when search/category/status change -> fetch page 1
+  // Initial + filters effect: when submittedQuery/category/status change -> fetch page 1
   useEffect(() => {
     let mounted = true;
     const doFetch = async () => {
@@ -96,9 +100,9 @@ const ProductsPage = () => {
       mounted = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, category, status]);
+  }, [debouncedSubmittedQuery, category, status]);
 
-  // Page change effect
+  // Page change effect (unchanged)
   useEffect(() => {
     let mounted = true;
     const fetchPage = async () => {
@@ -122,6 +126,16 @@ const ProductsPage = () => {
   const onSearchChange = (e) => setSearch(e.target.value);
   const onCategoryChange = (e) => setCategory(e.target.value);
   const onStatusChange = (e) => setStatus(e.target.value);
+
+  // When user presses Enter in the search box we commit the value to submittedQuery
+  const onSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      // commit trimmed query (could be empty string to clear search)
+      setSubmittedQuery(search.trim());
+      // reset to page 1
+      setCurrentPage(1);
+    }
+  };
 
   const goToPage = (p) => {
     const pn = Number(p || 1);
@@ -186,7 +200,7 @@ const ProductsPage = () => {
   if (fetchingProducts) {
     return (
       <div className="container">
-        <PageLoader />
+        <ProductsTableSkeleton />
       </div>
     );
   }
@@ -211,6 +225,7 @@ const ProductsPage = () => {
             <input
               value={search}
               onChange={onSearchChange}
+              onKeyDown={onSearchKeyDown}
               type="text"
               placeholder="Search products by name, SKU, or category..."
               aria-label="Search products"
@@ -312,16 +327,17 @@ const ProductsPage = () => {
                     <td data-label="Status">
                       <span
                         className={`status ${
-                          p.isPublished ? "active" : "inactive"
+                          p.active === "ACTIVE" ? "active" : "inactive"
                         }`}
                       >
-                        {p.isPublished ? "Active" : "Inactive"}
+                        {p.active === "ACTIVE" ? "Active" : "Inactive"}
                       </span>
                     </td>
 
                     <td data-label="Actions">
                       <div className="actions">
                         <button
+                          onClick={() => navigate("/view-product/" + p._id)}
                           className="btn btn-view"
                           title="View Product"
                           type="button"
@@ -331,9 +347,7 @@ const ProductsPage = () => {
                         </button>
 
                         <button
-                          onClick={() =>
-                            navigate("/edit-product?productId=" + p._id)
-                          }
+                          onClick={() => navigate("/edit-product/" + p._id)}
                           className="btn btn-edit"
                           title="Edit Product"
                           type="button"

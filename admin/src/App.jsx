@@ -25,6 +25,7 @@ import useAuth from "./store/useAuth";
 import { useEffect } from "react";
 import Loader from "./components/Loader";
 import ForgetPassword from "./pages/ForgetPassword";
+import ViewProductPage from "./pages/ViewProductPage";
 
 const App = () => {
   const { admin, isAuth, isChecking } = useAuth();
@@ -55,7 +56,8 @@ const App = () => {
               <Route path="customers" element={<UsersPage />} />
               <Route path="billing-info" element={<BillingInfo />} />
               <Route path="add-product" element={<AddProduct />} />
-              <Route path="edit-product" element={<EditProduct />} />
+              <Route path="edit-product/:id" element={<EditProduct />} />
+              <Route path="view-product/:id" element={<ViewProductPage />} />
             </Route>
             <Route
               path="/admin-login"

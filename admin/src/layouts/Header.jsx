@@ -11,7 +11,7 @@ const Header = () => {
   return (
     <header className="topbar" role="banner">
       <div className="top-left">
-        <div className="search" role="search">
+        {/* <div className="search" role="search">
           <input
             type="search"
             placeholder="Search for orders, users, products..."
@@ -20,7 +20,7 @@ const Header = () => {
           <button className="search-btn" aria-hidden="true">
             <icons.FcSearch size={24} />
           </button>
-        </div>
+        </div> */}
       </div>
       <div className="top-right">
         <button
