@@ -28,6 +28,7 @@ const ProductsPage = () => {
     getAllProducts,
     searchProducts,
     fetchingProducts,
+    deleteProduct,
     total = 0,
     page: storePage = 1,
     pages: storePages = 1,
@@ -357,6 +358,9 @@ const ProductsPage = () => {
                         </button>
 
                         <button
+                          onClick={(e) => {
+                            deleteProduct(p?._id, e.target);
+                          }}
                           className="btn btn-delete"
                           title="Delete Product"
                           type="button"

@@ -1,5 +1,11 @@
 import React from "react";
 import "../styles/orders.css";
+import { CiEdit } from "react-icons/ci";
+import { MdDelete } from "react-icons/md";
+import { FiEye } from "react-icons/fi";
+import { TbPlayerTrackNext } from "react-icons/tb";
+import { GrChapterPrevious } from "react-icons/gr";
+import ProductsTableSkeleton from "../skeletons/ProductPageSkeleton";
 
 const OrdersPage = () => {
   return (
@@ -69,128 +75,31 @@ const OrdersPage = () => {
               </td>
               <td data-label="Actions">
                 <div class="actions">
-                  <button class="btn btn-view" title="View">
-                    <span class="icon-view"></span>
+                  <button
+                    className="btn btn-view"
+                    title="View Product"
+                    type="button"
+                    aria-label={`View`}
+                  >
+                    <FiEye size={20} />
                   </button>
-                  <button class="btn btn-edit" title="Edit">
-                    <span class="icon-edit"></span>
+
+                  <button
+                    className="btn btn-edit"
+                    title="Edit Product"
+                    type="button"
+                    aria-label={`Edit`}
+                  >
+                    <CiEdit size={20} />
                   </button>
-                  <button class="btn btn-delete" title="Delete">
-                    <span class="icon-delete"></span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td data-label="Product">
-                <div class="product-info">
-                  <img
-                    src="https://via.placeholder.com/50"
-                    alt="T-Shirt"
-                    class="product-img"
-                  />
-                  <div>
-                    <div class="product-name">Cotton T-Shirt</div>
-                    <div class="product-category">Clothing</div>
-                  </div>
-                </div>
-              </td>
-              <td data-label="SKU">TSH-045</td>
-              <td data-label="Price" class="price">
-                $24.99
-              </td>
-              <td data-label="Stock" class="stock low">
-                8
-              </td>
-              <td data-label="Status">
-                <span class="status active">Active</span>
-              </td>
-              <td data-label="Actions">
-                <div class="actions">
-                  <button class="btn btn-view" title="View">
-                    <span class="icon-view"></span>
-                  </button>
-                  <button class="btn btn-edit" title="Edit">
-                    <span class="icon-edit"></span>
-                  </button>
-                  <button class="btn btn-delete" title="Delete">
-                    <span class="icon-delete"></span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td data-label="Product">
-                <div class="product-info">
-                  <img
-                    src="https://via.placeholder.com/50"
-                    alt="Book"
-                    class="product-img"
-                  />
-                  <div>
-                    <div class="product-name">Atomic Habits</div>
-                    <div class="product-category">Books</div>
-                  </div>
-                </div>
-              </td>
-              <td data-label="SKU">BOK-112</td>
-              <td data-label="Price" class="price">
-                $16.50
-              </td>
-              <td data-label="Stock" class="stock out">
-                0
-              </td>
-              <td data-label="Status">
-                <span class="status inactive">Inactive</span>
-              </td>
-              <td data-label="Actions">
-                <div class="actions">
-                  <button class="btn btn-view" title="View">
-                    <span class="icon-view"></span>
-                  </button>
-                  <button class="btn btn-edit" title="Edit">
-                    <span class="icon-edit"></span>
-                  </button>
-                  <button class="btn btn-delete" title="Delete">
-                    <span class="icon-delete"></span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td data-label="Product">
-                <div class="product-info">
-                  <img
-                    src="https://via.placeholder.com/50"
-                    alt="Chair"
-                    class="product-img"
-                  />
-                  <div>
-                    <div class="product-name">Ergonomic Office Chair</div>
-                    <div class="product-category">Home & Garden</div>
-                  </div>
-                </div>
-              </td>
-              <td data-label="SKU">CHR-078</td>
-              <td data-label="Price" class="price">
-                $189.00
-              </td>
-              <td data-label="Stock" class="stock">
-                23
-              </td>
-              <td data-label="Status">
-                <span class="status active">Active</span>
-              </td>
-              <td data-label="Actions">
-                <div class="actions">
-                  <button class="btn btn-view" title="View">
-                    <span class="icon-view"></span>
-                  </button>
-                  <button class="btn btn-edit" title="Edit">
-                    <span class="icon-edit"></span>
-                  </button>
-                  <button class="btn btn-delete" title="Delete">
-                    <span class="icon-delete"></span>
+
+                  <button
+                    className="btn btn-delete"
+                    title="Delete Order"
+                    type="button"
+                    aria-label={`Delete}`}
+                  >
+                    <MdDelete size={20} />
                   </button>
                 </div>
               </td>

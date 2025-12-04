@@ -146,7 +146,7 @@ const ViewProductPage = () => {
         </div>
 
         <div className="actions">
-          <div className="quantity" aria-label="Quantity selector">
+          {/* <div className="quantity" aria-label="Quantity selector">
             <button
               className="qty-btn"
               type="button"
@@ -171,7 +171,7 @@ const ViewProductPage = () => {
             >
               +
             </button>
-          </div>
+          </div> */}
 
           <button
             className="add-to-cart"

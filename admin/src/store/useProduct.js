@@ -20,6 +20,8 @@ const useProduct = create((set, get) => ({
   isgetProduct: false,
   isupdatingProduct: false,
 
+  isDeleteing: false,
+
   // Create product (unchanged logic except small fixes)
   createNewProduct: async (data = {}, navigate) => {
     set({ isCreatingProduct: true, createPercent: 0, createError: null });
@@ -162,13 +164,29 @@ const useProduct = create((set, get) => ({
       set({ singleProduct: response?.data?.product ?? {} });
       return response?.data;
     } catch (error) {
+      console.log(error);
+    } finally {
+      set({ isgetProduct: false });
+    }
+  },
+  deleteProduct: async (id, target) => {
+    try {
+      target.textContent = "...";
+      set({ isDeleteing: true });
+      const response = await axios.delete(
+        "/admin/product/delete-product?id=" + id
+      );
+      await get().getAllProducts();
+      set({ page: 1, pages: 1 });
+      return response?.data;
+    } catch (error) {
       console.error(
-        "getSingleProduct error:",
+        "deleteProduct error:",
         error.response?.data ?? error.message ?? error
       );
       throw error;
     } finally {
-      set({ isgetProduct: false });
+      set({ isDeleteing: false });
     }
   },
 }));
